@@ -26,9 +26,9 @@
 
 <p>
   <a href="#-key-features"><b>Features</b></a> •
-  <a href="#%EF%B8%8F-system-design--architecture"><b>System Design</b></a> •
+  <a href="#-system-design--architecture"><b>System Design</b></a> •
   <a href="#-optimization-model--timeline"><b>Optimization</b></a> •
-  <a href="#-data-validation--metrics"><b>Validation &amp; KPIs</b></a> •
+  <a href="#-data-validation--kpis"><b>Validation &amp; KPIs</b></a> •
   <a href="#-tech-stack"><b>Tech Stack</b></a> •
   <a href="#-api-endpoints"><b>API Reference</b></a> •
   <a href="#-quick-start"><b>Quick Start</b></a>
@@ -94,7 +94,7 @@ Built from [`Aleph_Stand_Allocation_Build_Spec_v4.docx`](./Aleph_Stand_Allocatio
 
 ---
 
-## 🏗️ System Design & Architecture
+## 📐 System Design & Architecture
 
 <div align="center">
   <img src="docs/assets/pipeline-architecture.svg" alt="Animated System Design Pipeline" width="100%"/>
@@ -255,7 +255,7 @@ sequenceDiagram
 
 ---
 
-## 🛠️ Tech Stack
+## 🔧 Tech Stack
 
 <div align="center">
 
