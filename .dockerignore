@@ -1,0 +1,17 @@
+.git
+.mypy_cache
+.pytest_cache
+.ruff_cache
+__pycache__
+*.pyc
+data/allocation.db
+*.docx
+.env
+.env.*
+tests/
+docs/
+requirements-dev.txt
+mypy.ini
+pytest.ini
+ruff.toml
+

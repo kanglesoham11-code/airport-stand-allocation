@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 360" width="100%" height="360">
+  <defs>
+    <linearGradient id="bgTime" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#080d1e"/>
+      <stop offset="100%" stop-color="#0f1b38"/>
+    </linearGradient>
+    <linearGradient id="plbBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+    <linearGradient id="remBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <clipPath id="timeClip">
+      <rect width="1100" height="360" rx="16"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#timeClip)">
+    <rect width="1100" height="360" fill="url(#bgTime)"/>
+
+    <!-- Title -->
+    <text x="36" y="40" font-family="Segoe UI, sans-serif" font-size="19" font-weight="800" fill="#f8fafc">
+      LIVE STAND GANTT TIMELINE — 06:00 TO 12:00 UTC (15-MIN BUFFER)
+    </text>
+    <text x="36" y="60" font-family="Segoe UI, sans-serif" font-size="12.5" fill="#94a3b8">
+      PLB Contact Stands prioritized first, Remote Stands overflow, half-open [arrival, departure + 15m) intervals
+    </text>
+
+    <!-- Legend -->
+    <g transform="translate(730, 26)" font-family="Segoe UI, sans-serif" font-size="12" font-weight="600">
+      <rect x="0" y="0" width="14" height="14" rx="3" fill="url(#plbBar)"/>
+      <text x="20" y="11" fill="#6ee7b7">PLB Stand</text>
+      <rect x="100" y="0" width="14" height="14" rx="3" fill="url(#remBar)"/>
+      <text x="120" y="11" fill="#fde68a">Remote Stand</text>
+      <rect x="220" y="0" width="14" height="14" rx="3" fill="#475569" stroke="#94a3b8" stroke-dasharray="2 2"/>
+      <text x="240" y="11" fill="#cbd5e1">+15m Buffer</text>
+    </g>
+
+    <!-- Time Grid Header -->
+    <g transform="translate(150, 82)" font-family="Consolas, monospace" font-size="11.5" fill="#64748b">
+      <text x="0" y="0">06:00</text><line x1="15" y1="8" x2="15" y2="255" stroke="#1e293b" stroke-width="1"/>
+      <text x="145" y="0">07:00</text><line x1="160" y1="8" x2="160" y2="255" stroke="#1e293b" stroke-width="1"/>
+      <text x="290" y="0">08:00</text><line x1="305" y1="8" x2="305" y2="255" stroke="#1e293b" stroke-width="1"/>
+      <text x="435" y="0">09:00</text><line x1="450" y1="8" x2="450" y2="255" stroke="#1e293b" stroke-width="1"/>
+      <text x="580" y="0">10:00</text><line x1="595" y1="8" x2="595" y2="255" stroke="#1e293b" stroke-width="1"/>
+      <text x="725" y="0">11:00</text><line x1="740" y1="8" x2="740" y2="255" stroke="#1e293b" stroke-width="1"/>
+      <text x="870" y="0">12:00</text><line x1="885" y1="8" x2="885" y2="255" stroke="#1e293b" stroke-width="1"/>
+
+      <!-- Peak Demand Line at 09:15 UTC -->
+      <line x1="486" y1="8" x2="486" y2="255" stroke="#f43f5e" stroke-width="2" stroke-dasharray="5 4">
+        <animate attributeName="stroke-opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite"/>
+      </line>
+      <rect x="424" y="-14" width="124" height="18" rx="4" fill="#881337" stroke="#f43f5e"/>
+      <text x="432" y="-1" fill="#fecdd3" font-size="10.5" font-weight="700">PEAK 12/12 @ 09:15</text>
+    </g>
+
+    <!-- Stand Rows -->
+    <g font-family="Consolas, monospace" font-size="12" font-weight="700">
+      <!-- C01 (PLB L) - actual flights BQ322, CZ728, AX937 -->
+      <text x="36" y="114" fill="#38bdf8">C01 (PLB • L)</text>
+      <rect x="262" y="98" width="193" height="22" rx="5" fill="url(#plbBar)">
+        <animate attributeName="width" values="0;193;193" dur="6s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="455" y="98" width="36" height="22" rx="4" fill="#334155" fill-opacity="0.7"/>
+      <text x="272" y="113" fill="#042f2e" font-size="10.5">BQ322 (M)</text>
+
+      <rect x="552" y="98" width="169" height="22" rx="5" fill="url(#plbBar)">
+        <animate attributeName="width" values="0;169;169" dur="6s" begin="0.3s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="721" y="98" width="36" height="22" rx="4" fill="#334155" fill-opacity="0.7"/>
+      <text x="562" y="113" fill="#042f2e" font-size="10.5">CZ728 (M)</text>
+
+      <rect x="805" y="98" width="157" height="22" rx="5" fill="url(#plbBar)">
+        <animate attributeName="width" values="0;157;157" dur="6s" begin="0.6s" repeatCount="indefinite"/>
+      </rect>
+      <text x="815" y="113" fill="#042f2e" font-size="10.5">AX937 (M)</text>
+
+      <!-- C02 (PLB M) -->
+      <text x="36" y="152" fill="#38bdf8">C02 (PLB • M)</text>
+      <rect x="189" y="136" width="133" height="22" rx="5" fill="url(#plbBar)">
+        <animate attributeName="width" values="0;133;133" dur="6s" begin="0.15s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="322" y="136" width="36" height="22" rx="4" fill="#334155" fill-opacity="0.7"/>
+      <text x="198" y="151" fill="#042f2e" font-size="10.5">KT610 (S)</text>
+
+      <rect x="440" y="136" width="210" height="22" rx="5" fill="url(#plbBar)">
+        <animate attributeName="width" values="0;210;210" dur="6s" begin="0.45s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="650" y="136" width="36" height="22" rx="4" fill="#334155" fill-opacity="0.7"/>
+      <text x="452" y="151" fill="#042f2e" font-size="10.5">BQ901 (M)</text>
+
+      <!-- C03 (PLB S) -->
+      <text x="36" y="190" fill="#38bdf8">C03 (PLB • S)</text>
+      <rect x="330" y="174" width="110" height="22" rx="5" fill="url(#plbBar)">
+        <animate attributeName="width" values="0;110;110" dur="6s" begin="0.2s" repeatCount="indefinite"/>
+      </rect>
+      <text x="340" y="189" fill="#042f2e" font-size="10.5">EZ214 (S)</text>
+      <rect x="520" y="174" width="145" height="22" rx="5" fill="url(#plbBar)">
+        <animate attributeName="width" values="0;145;145" dur="6s" begin="0.5s" repeatCount="indefinite"/>
+      </rect>
+      <text x="530" y="189" fill="#042f2e" font-size="10.5">AX412 (S)</text>
+
+      <!-- R01 (REMOTE L) -->
+      <text x="36" y="228" fill="#fbbf24">R01 (REM • L)</text>
+      <rect x="415" y="212" width="245" height="22" rx="5" fill="url(#remBar)">
+        <animate attributeName="width" values="0;245;245" dur="6s" begin="0.25s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="660" y="212" width="36" height="22" rx="4" fill="#334155" fill-opacity="0.7"/>
+      <text x="427" y="227" fill="#fffbeb" font-size="10.5">CZ554 (L)</text>
+
+      <!-- R03 (REMOTE M) -->
+      <text x="36" y="266" fill="#fbbf24">R03 (REM • M)</text>
+      <rect x="407" y="250" width="121" height="22" rx="5" fill="url(#remBar)">
+        <animate attributeName="width" values="0;121;121" dur="6s" begin="0.35s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="528" y="250" width="36" height="22" rx="4" fill="#334155" fill-opacity="0.7"/>
+      <text x="415" y="265" fill="#fffbeb" font-size="10.5">EZ674 (M)</text>
+
+      <rect x="680" y="250" width="185" height="22" rx="5" fill="url(#remBar)">
+        <animate attributeName="width" values="0;185;185" dur="6s" begin="0.65s" repeatCount="indefinite"/>
+      </rect>
+      <text x="692" y="265" fill="#fffbeb" font-size="10.5">DX310 (M)</text>
+
+      <!-- R06 (REMOTE S) -->
+      <text x="36" y="304" fill="#fbbf24">R06 (REM • S)</text>
+      <rect x="177" y="288" width="121" height="22" rx="5" fill="url(#remBar)">
+        <animate attributeName="width" values="0;121;121" dur="6s" begin="0.1s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="298" y="288" width="36" height="22" rx="4" fill="#334155" fill-opacity="0.7"/>
+      <text x="187" y="303" fill="#fffbeb" font-size="10.5">CZ911 (S)</text>
+    </g>
+
+    <!-- Bottom Caption -->
+    <text x="36" y="342" font-family="Consolas, monospace" font-size="11.5" fill="#94a3b8">
+      Unassigned flights receive deterministic NO_FREE_COMPATIBLE_STAND reasons listing exact blocking flight IDs
+    </text>
+  </g>
+</svg>
