@@ -44,3 +44,20 @@ def test_allowed_origins_parsed() -> None:
         ]
     finally:
         _reload_with(API_KEYS=key, ALLOWED_ORIGINS=None)
+
+
+def test_dotenv_loader_populates_unset_env_only(tmp_path, monkeypatch) -> None:
+    env_file = tmp_path / ".env"
+    env_file.write_text(
+        '# comment\nDOTENV_TEST_A=hello\nDOTENV_TEST_B="quoted"\n',
+        encoding="utf-8",
+    )
+    monkeypatch.delenv("DOTENV_TEST_A", raising=False)
+    monkeypatch.setenv("DOTENV_TEST_B", "already-set")
+
+    config._load_dotenv_file(env_file)
+
+    import os
+
+    assert os.environ["DOTENV_TEST_A"] == "hello"
+    assert os.environ["DOTENV_TEST_B"] == "already-set"

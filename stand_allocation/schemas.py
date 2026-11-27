@@ -41,6 +41,7 @@ class AllocationsOut(BaseModel):
 
     planning_window: PlanningWindowOut
     run_id: str
+    buffer_minutes: int
     allocator: str
     primary_method: str
     solver_status: str
@@ -77,9 +78,11 @@ class ReadyOut(BaseModel):
     valid_flights: int = 0
     data_issues: int = 0
     loaded_at: str | None = None
+    buffer_minutes: int = 15
     allocator: str | None = None
     primary_method: str | None = None
     solver_status: str | None = None
+    solve_seconds: float | None = None
 
 
 class HealthOut(BaseModel):

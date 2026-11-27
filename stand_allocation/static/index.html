@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aleph Stand Allocation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=Roboto+Mono:wght@400;500&family=Roboto:wght@400;500;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,0,0&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <!-- Top Google-style App Bar -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-icon" aria-hidden="true">
+          <span class="material-symbols-outlined">flight_takeoff</span>
+        </span>
+        <span class="brand-title">Aleph</span>
+        <span class="brand-sub">Stand Allocation</span>
+      </div>
+
+      <nav class="nav-tabs" id="navTabs" aria-label="Primary navigation" hidden>
+        <button class="nav-tab active" data-tab="overview" type="button">
+          Overview
+        </button>
+        <button class="nav-tab" data-tab="flights" type="button">
+          Flights <span class="tab-count" id="tabCountFlights">0</span>
+        </button>
+        <button class="nav-tab" data-tab="stands" type="button">
+          Stands <span class="tab-count" id="tabCountStands">0</span>
+        </button>
+        <button class="nav-tab" data-tab="audit" type="button">
+          Data &amp; Ops <span class="tab-count" id="tabCountIssues">0</span>
+        </button>
+      </nav>
+
+      <div class="topbar-actions">
+        <div class="status-chip" id="readyChip" title="Server readiness">
+          <span class="status-dot"></span>
+          <span id="readyText">Checking…</span>
+        </div>
+        <button class="icon-btn" id="refreshBtn" type="button" title="Refresh data" hidden>
+          <span class="material-symbols-outlined">refresh</span>
+        </button>
+        <button class="btn-outline" id="keyBtn" type="button" hidden>
+          <span class="material-symbols-outlined">key</span>
+          <span>API Key</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="container">
+    <!-- Auth Gate (Google Account Sign-In Inspired) -->
+    <section class="auth-wrapper" id="authSection">
+      <div class="auth-card">
+        <div class="auth-badge" id="authReadyBadge">
+          <span class="status-dot"></span>
+          <span id="authReadySummary">Connecting to backend…</span>
+        </div>
+
+        <h1 class="auth-title">Sign in to workspace</h1>
+        <p class="auth-subtitle">
+          Enter your <code class="mono-inline">X-API-Key</code> to view stand assignments, timeline scheduling, and operational metrics.
+        </p>
+
+        <form id="authForm" class="auth-form">
+          <label class="field-label" for="apiKeyInput">API Key</label>
+          <div class="input-group">
+            <input
+              id="apiKeyInput"
+              type="password"
+              class="text-input mono"
+              placeholder="Minimum 32 characters"
+              autocomplete="off"
+              required
+            />
+            <button
+              type="button"
+              class="toggle-vis"
+              id="toggleKeyVis"
+              aria-label="Show or hide API key"
+            >
+              <span class="material-symbols-outlined" id="visIcon">visibility</span>
+            </button>
+          </div>
+
+          <label class="checkbox-row">
+            <input type="checkbox" id="rememberKey" />
+            <span>Remember key in this browser</span>
+          </label>
+
+          <div class="error-banner" id="authError" hidden>
+            <span class="material-symbols-outlined">error</span>
+            <span id="authErrorText"></span>
+          </div>
+
+          <div class="auth-actions">
+            <a class="btn-text" href="/docs" target="_blank" rel="noopener">
+              Open API Docs
+            </a>
+            <button type="submit" class="btn-primary" id="connectBtn">
+              Connect
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Dashboard Views -->
+    <div id="appContent" hidden>
+      <!-- VIEW 1: OVERVIEW -->
+      <section class="tab-panel active" id="panel-overview">
+        <div class="section-header">
+          <div>
+            <h1 class="page-title">Operations Overview</h1>
+            <p class="page-subtitle" id="windowSubtitle">Planning window: 06:00–12:00 UTC</p>
+          </div>
+          <div class="meta-pills" id="solverPills"></div>
+        </div>
+
+        <!-- 4 Clean KPI Cards -->
+        <div class="kpi-grid" id="kpiGrid"></div>
+
+        <!-- Interactive Gantt Timeline Card -->
+        <div class="card">
+          <div class="card-toolbar">
+            <div class="toolbar-left">
+              <h2 class="card-title">Stand Allocation Timeline</h2>
+              <div class="legend">
+                <span class="legend-item"><span class="swatch plb"></span>PLB Gate</span>
+                <span class="legend-item"><span class="swatch remote"></span>Remote Stand</span>
+                <span class="legend-item"><span class="swatch buffer"></span><span id="bufferLegendText">15m Buffer</span></span>
+                <span class="legend-item"><span class="swatch peak"></span>Peak Demand</span>
+              </div>
+            </div>
+
+            <div class="toolbar-filters">
+              <div class="search-box compact">
+                <span class="material-symbols-outlined">search</span>
+                <input
+                  type="search"
+                  id="ganttSearch"
+                  placeholder="Filter flight ID…"
+                  aria-label="Filter timeline by flight ID"
+                />
+              </div>
+
+              <div class="segmented" id="ganttTypeFilter" role="group" aria-label="Stand type">
+                <button type="button" class="seg-btn active" data-val="ALL">All</button>
+                <button type="button" class="seg-btn" data-val="PLB">PLB</button>
+                <button type="button" class="seg-btn" data-val="REMOTE">Remote</button>
+              </div>
+
+              <div class="segmented" id="ganttSizeFilter" role="group" aria-label="Aircraft size">
+                <button type="button" class="seg-btn active" data-val="ALL">All</button>
+                <button type="button" class="seg-btn" data-val="S">S</button>
+                <button type="button" class="seg-btn" data-val="M">M</button>
+                <button type="button" class="seg-btn" data-val="L">L</button>
+              </div>
+
+              <label class="toggle-chip">
+                <input type="checkbox" id="showBufferToggle" checked />
+                <span>Buffer</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="gantt-scroll">
+            <div class="gantt-board" id="ganttBoard"></div>
+          </div>
+        </div>
+
+        <!-- All 8 Planning Metrics (M1-M8) -->
+        <div class="card">
+          <div class="card-toolbar">
+            <div>
+              <h2 class="card-title">Planning Metrics (M1–M8)</h2>
+              <p class="card-subtitle">Exact definitions and CP-SAT vs. Greedy baseline comparison</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Metric</th>
+                  <th>Value</th>
+                  <th>Coverage</th>
+                  <th>Definition</th>
+                </tr>
+              </thead>
+              <tbody id="metricsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: FLIGHTS -->
+      <section class="tab-panel" id="panel-flights">
+        <div class="section-header">
+          <div>
+            <h1 class="page-title">Flight Allocations</h1>
+            <p class="page-subtitle">Search, filter, and inspect assigned stands or blocking reasons</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-toolbar">
+            <div class="toolbar-filters">
+              <div class="search-box">
+                <span class="material-symbols-outlined">search</span>
+                <input
+                  type="search"
+                  id="flightSearch"
+                  placeholder="Search flight ID, stand, or reason…"
+                  aria-label="Search flights"
+                />
+              </div>
+
+              <div class="segmented" id="flightStatusFilter" role="group" aria-label="Flight status">
+                <button type="button" class="seg-btn active" data-val="ALL">All</button>
+                <button type="button" class="seg-btn" data-val="ASSIGNED">Assigned</button>
+                <button type="button" class="seg-btn" data-val="UNASSIGNED">Unassigned</button>
+              </div>
+
+              <div class="segmented" id="flightSizeFilter" role="group" aria-label="Flight size">
+                <button type="button" class="seg-btn active" data-val="ALL">All</button>
+                <button type="button" class="seg-btn" data-val="S">S</button>
+                <button type="button" class="seg-btn" data-val="M">M</button>
+                <button type="button" class="seg-btn" data-val="L">L</button>
+              </div>
+            </div>
+            <div class="result-count" id="flightResultCount"></div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Flight</th>
+                  <th>Size</th>
+                  <th>Arrival (UTC)</th>
+                  <th>Departure (UTC)</th>
+                  <th>Ground</th>
+                  <th>Status</th>
+                  <th>Stand</th>
+                  <th>Notes / Blocker Reason</th>
+                </tr>
+              </thead>
+              <tbody id="flightsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: STANDS -->
+      <section class="tab-panel" id="panel-stands">
+        <div class="section-header">
+          <div>
+            <h1 class="page-title">Airport Stands</h1>
+            <p class="page-subtitle">Select any stand to inspect its chronological schedule and turnaround gaps</p>
+          </div>
+          <div class="segmented" id="standTypeFilter" role="group" aria-label="Filter stands by type">
+            <button type="button" class="seg-btn active" data-val="ALL">All Stands</button>
+            <button type="button" class="seg-btn" data-val="PLB">PLB Contact</button>
+            <button type="button" class="seg-btn" data-val="REMOTE">Remote Apron</button>
+          </div>
+        </div>
+
+        <div class="stand-grid" id="standGrid"></div>
+      </section>
+
+      <!-- VIEW 4: DATA AUDIT & OPS -->
+      <section class="tab-panel" id="panel-audit">
+        <div class="section-header">
+          <div>
+            <h1 class="page-title">Data Quality &amp; System Ops</h1>
+            <p class="page-subtitle">Row-level CSV validation audit and live runtime API telemetry</p>
+          </div>
+          <a class="btn-outline" href="/docs" target="_blank" rel="noopener">
+            <span class="material-symbols-outlined">open_in_new</span>
+            <span>Swagger UI</span>
+          </a>
+        </div>
+
+        <!-- Ops Telemetry Cards -->
+        <div class="ops-grid" id="opsGrid"></div>
+
+        <!-- Data Issues Table -->
+        <div class="card">
+          <div class="card-toolbar">
+            <div>
+              <h2 class="card-title">CSV Validation Audit</h2>
+              <p class="card-subtitle" id="issuesSummary">Loading validation log…</p>
+            </div>
+            <div class="segmented" id="issueActionFilter" role="group" aria-label="Issue action">
+              <button type="button" class="seg-btn active" data-val="ALL">All</button>
+              <button type="button" class="seg-btn" data-val="FIXED">Fixed</button>
+              <button type="button" class="seg-btn" data-val="DROPPED">Dropped</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Row</th>
+                  <th>Flight ID</th>
+                  <th>Field</th>
+                  <th>Code</th>
+                  <th>Action</th>
+                  <th>Original → Normalized</th>
+                  <th>Explanation</th>
+                </tr>
+              </thead>
+              <tbody id="issuesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Stand / Flight Slide-Over Detail Drawer -->
+  <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+  <aside class="drawer" id="detailDrawer" aria-hidden="true">
+    <div class="drawer-header">
+      <div>
+        <h2 class="drawer-title" id="drawerTitle">Details</h2>
+        <p class="drawer-subtitle" id="drawerSubtitle"></p>
+      </div>
+      <button class="icon-btn" id="closeDrawerBtn" type="button" aria-label="Close drawer">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+  </aside>
+
+  <!-- Floating Tooltip for Gantt Bars -->
+  <div class="gantt-tooltip" id="ganttTooltip" hidden></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
+

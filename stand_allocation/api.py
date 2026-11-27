@@ -11,7 +11,8 @@ from typing import cast
 from fastapi import FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from stand_allocation import config, models, schemas, service
@@ -137,9 +138,11 @@ def ready(request: Request) -> schemas.ReadyOut:
         valid_flights=len(run.allocations),
         data_issues=len(run.data_issues),
         loaded_at=run.created_at,
+        buffer_minutes=run.buffer_minutes,
         allocator=run.allocator,
         primary_method=run.primary_method,
         solver_status=run.solver_status,
+        solve_seconds=round(run.solve_seconds, 3),
     )
 
 
@@ -193,6 +196,7 @@ def allocations(
     return schemas.AllocationsOut(
         planning_window=_window(),
         run_id=run.run_id,
+        buffer_minutes=run.buffer_minutes,
         allocator=run.allocator,
         primary_method=run.primary_method,
         solver_status=run.solver_status,
@@ -301,10 +305,21 @@ def metrics(request: Request) -> schemas.MetricsOut:
     )
 
 
+if config.STATIC_DIR.is_dir():
+    app.mount("/static", StaticFiles(directory=str(config.STATIC_DIR)), name="static")
+
+
+@app.get("/", include_in_schema=False)
+def index() -> FileResponse:
+    """Serve the Google-style operations dashboard."""
+    return FileResponse(config.STATIC_DIR / "index.html")
+
+
 # Catch-all: unknown paths return 404 in the standard shape. Registered last.
 @app.api_route(
     "/{path_name:path}",
     methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
+    include_in_schema=False,
 )
 async def _catch_all(path_name: str, request: Request) -> None:
     raise ApiError(404, "NOT_FOUND", "Route not found.")

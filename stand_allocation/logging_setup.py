@@ -13,6 +13,20 @@ from typing import Any
 
 from stand_allocation import config
 
+_EXTRA_FIELDS = (
+    "run_id",
+    "request_id",
+    "route",
+    "method",
+    "path",
+    "status",
+    "status_class",
+    "client_ip",
+    "duration_ms",
+    "rate_limited",
+    "key_fingerprint",
+)
+
 
 class _JsonFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
@@ -24,9 +38,9 @@ class _JsonFormatter(logging.Formatter):
         }
         if record.exc_info:
             payload["traceback"] = self.formatException(record.exc_info)
-        for key in ("run_id", "request_id"):
+        for key in _EXTRA_FIELDS:
             value = getattr(record, key, None)
-            if value:
+            if value is not None:
                 payload[key] = value
         extra = getattr(record, "extra", None)
         if isinstance(extra, dict):

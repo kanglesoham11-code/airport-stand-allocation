@@ -7,7 +7,7 @@
 
 <!-- Dynamic Typing Subtitle -->
 <a href="https://github.com/kanglesoham11-code/airport-stand-allocation">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=19&duration=3000&pause=900&color=38BDF8&center=true&vCenter=true&width=920&lines=Exact+OR-Tools+CP-SAT+Airport+Stand+Optimization;Dual-Candidate+Engine%3A+CP-SAT+vs+Greedy+Baseline;16-Step+Deterministic+Flight+CSV+Validation+Pipeline;HMAC+Auth+%E2%80%A2+Dual+Token-Bucket+Rate+Limiter+%E2%80%A2+Run+ETags;44%2F44+Tests+Passing+%E2%80%A2+Zero-DB+Cached+Runtime+%E2%80%A2+Docker+Ready" alt="Typing SVG" />
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=19&duration=3000&pause=900&color=38BDF8&center=true&vCenter=true&width=920&lines=Exact+OR-Tools+CP-SAT+Airport+Stand+Optimization;Dual-Candidate+Engine%3A+CP-SAT+vs+Greedy+Baseline;16-Step+Deterministic+Flight+CSV+Validation+Pipeline;HMAC+Auth+%E2%80%A2+Dual+Token-Bucket+Rate+Limiter+%E2%80%A2+Run+ETags;49%2F49+Tests+Passing+%E2%80%A2+Zero-DB+Cached+Runtime+%E2%80%A2+Docker+Ready" alt="Typing SVG" />
 </a>
 
 <br/>
@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/Pydantic-v2-E92063?style=for-the-badge&logo=pydantic&logoColor=white" alt="Pydantic v2"/>
   <img src="https://img.shields.io/badge/SQLite-Transactional-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite"/>
   <img src="https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/>
-  <img src="https://img.shields.io/badge/Tests-44%2F44_Passing-22C55E?style=for-the-badge&logo=pytest&logoColor=white" alt="44/44 Tests Passing"/>
+  <img src="https://img.shields.io/badge/Tests-49%2F49_Passing-22C55E?style=for-the-badge&logo=pytest&logoColor=white" alt="49/49 Tests Passing"/>
   <img src="https://img.shields.io/badge/Ruff-Clean-D7FF64?style=for-the-badge&logo=ruff&logoColor=black" alt="Ruff Clean"/>
 </p>
 
@@ -278,8 +278,9 @@ sequenceDiagram
 
 | Method & Path | Auth | Description |
 |---|---|---|
+| `GET /` | No | Interactive Google-style operations dashboard SPA (`/static/*`) |
 | `GET /health` | No | Liveness probe (`{"status": "ok"}`) |
-| `GET /ready` | No | Readiness probe with active `run_id`, stand/flight/issue counts, and `solver_status` |
+| `GET /ready` | No | Readiness probe with active `run_id`, stand/flight/issue counts, `buffer_minutes`, and `solver_status` |
 | `GET /docs` | No | Interactive Swagger UI backed by `Literal`-typed OpenAPI schemas |
 | `GET /allocations` | **Yes** | Paginated flight allocations (`?status=ASSIGNED\|UNASSIGNED&limit=100&offset=0`) |
 | `GET /stands` | **Yes** | List of all 12 airport stands (`PLB` / `REMOTE`, `S` / `M` / `L`) |
@@ -441,7 +442,7 @@ docker run -p 8000:8000 \
 ## 🧪 Testing & Quality Checks
 
 ```bash
-# Run all 44 tests
+# Run all 49 tests
 python -m pytest -v
 
 # Lint with Ruff
@@ -476,6 +477,9 @@ python -m mypy stand_allocation
 | `ALLOWED_ORIGINS` | `""` | Comma-separated CORS origins enabled via `CORSMiddleware` |
 | `LOG_LEVEL` | `INFO` | `DEBUG`, `INFO`, `WARNING`, or `ERROR` |
 | `DB_PATH` | `data/allocation.db` | SQLite database file path |
+| `TRUST_PROXY_HEADERS` | `false` | Read rightmost `X-Forwarded-For` IP when behind a reverse proxy |
+
+> Copy `.env.example` to `.env` for local runs — `config.py` automatically loads unset variables from `.env` at startup.
 
 ---
 

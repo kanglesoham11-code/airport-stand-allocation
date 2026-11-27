@@ -47,12 +47,21 @@ class RequestPipelineMiddleware(BaseHTTPMiddleware):
         return request.client.host if request.client else "unknown"
 
     def _route_template(self, request: Request) -> str:
+        matched_route = request.scope.get("route")
+        if matched_route is not None:
+            path = getattr(matched_route, "path", None) or getattr(
+                matched_route, "path_format", None
+            )
+            if path:
+                return str(path)
         for route in request.app.router.routes:
             match, _ = route.matches(request.scope)
             if match == Match.FULL:
-                template = getattr(route, "path_template", None)
+                template = getattr(route, "path", None) or getattr(
+                    route, "path_format", None
+                )
                 if template:
-                    return template
+                    return str(template)
         return "unmatched"
 
     def _error_response(
@@ -120,7 +129,7 @@ class RequestPipelineMiddleware(BaseHTTPMiddleware):
                 self._counters.record_rate_limited()
                 return self._rate_limited_response(request_id, retry, remaining, reset)
 
-            if path not in config.AUTH_FREE_PATHS:
+            if path not in config.AUTH_FREE_PATHS and not path.startswith("/static/"):
                 if (
                     self._failure_store.available(client_ip, AUTH_FAILURE_RULE, now)
                     < 1.0
@@ -281,6 +290,7 @@ class RequestPipelineMiddleware(BaseHTTPMiddleware):
                     request.headers.get("x-api-key", "")
                 )
                 if path not in config.AUTH_FREE_PATHS
+                and not path.startswith("/static/")
                 and path not in ("/health", "/ready")
                 else None,
             },

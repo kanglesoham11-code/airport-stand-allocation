@@ -21,6 +21,7 @@ from pathlib import Path
 # Project layout
 # ---------------------------------------------------------------------------
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+STATIC_DIR = Path(__file__).resolve().parent / "static"
 DATA_DIR = PROJECT_ROOT / "data"
 STANDS_CSV = DATA_DIR / "stands.csv"
 FLIGHTS_CSV = DATA_DIR / "flights.csv"
@@ -146,7 +147,7 @@ ALLOWED_ORIGINS: list[str] = []
 TRUST_PROXY_HEADERS = False
 
 AUTH_FREE_PATHS = frozenset(
-    {"/health", "/ready", "/docs", "/openapi.json", "/docs/oauth2-redirect"}
+    {"/", "/health", "/ready", "/docs", "/openapi.json", "/docs/oauth2-redirect"}
 )
 
 CSV_ENCODING = "utf-8-sig"
@@ -160,6 +161,23 @@ def _env(name: str, default: str) -> str:
     return os.environ.get(name, default)
 
 
+def _load_dotenv_file(path: Path) -> None:
+    """Populate unset environment variables from a local .env file if present."""
+    if not path.is_file():
+        return
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in ("'", '"'):
+            value = value[1:-1]
+        if key:
+            os.environ.setdefault(key, value)
+
+
 def _parse_bool(text: str) -> bool:
     lower = text.strip().lower()
     if lower == "true":
@@ -171,7 +189,9 @@ def _parse_bool(text: str) -> bool:
 
 def load_settings() -> None:
     """Read environment overrides and validate every setting (section 23.1)."""
-    global API_KEYS, BUFFER_MINUTES, SOLVER_TIME_LIMIT_SECONDS, ALLOCATOR, LOG_LEVEL, DB_PATH
+    _load_dotenv_file(PROJECT_ROOT / ".env")
+    global API_KEYS, BUFFER_MINUTES, BUFFER_SECONDS, SOLVER_TIME_LIMIT_SECONDS
+    global ALLOCATOR, LOG_LEVEL, DB_PATH, TRUST_PROXY_HEADERS, ALLOWED_ORIGINS
 
     # --- API_KEYS (required) ---
     raw_keys = _env("API_KEYS", "")
@@ -206,6 +226,7 @@ def load_settings() -> None:
             f"setting BUFFER_MINUTES: value {buffer_minutes} is not in 0..{MAX_BUFFER_MINUTES}"
         )
     BUFFER_MINUTES = buffer_minutes
+    BUFFER_SECONDS = buffer_minutes * SECONDS_PER_MINUTE
 
     # --- SOLVER_TIME_LIMIT_SECONDS ---
     try:
@@ -242,8 +263,11 @@ def load_settings() -> None:
     if not DB_PATH.is_absolute():
         DB_PATH = PROJECT_ROOT / db_path
 
+    # --- TRUST_PROXY_HEADERS ---
+    raw_proxy = _env("TRUST_PROXY_HEADERS", str(TRUST_PROXY_HEADERS).lower())
+    TRUST_PROXY_HEADERS = _parse_bool(raw_proxy)
+
     # --- ALLOWED_ORIGINS ---
-    global ALLOWED_ORIGINS
     origins = _env("ALLOWED_ORIGINS", "")
     ALLOWED_ORIGINS = [o.strip() for o in origins.split(",") if o.strip()]
 
